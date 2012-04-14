@@ -1,10 +1,15 @@
+var convertPitch = function (note) {
+    var r = /([a-z])(\d)/i.exec(note);
+    return ((r[1] + 1) * 12) + "cdefgab".indexOf(r[0].toLowerCase());
+}
+
 var compile = function (musexpr, time) {
     time = time || [0];
     if (musexpr.tag == 'note') {
         t = time[0];
         time[0] += musexpr.dur;
         return [{ tag: 'note',
-                  pitch: musexpr.pitch,
+                  pitch: convertPitch(musexpr.pitch),
                   start: t,
                   dur: musexpr.dur }];
     }
