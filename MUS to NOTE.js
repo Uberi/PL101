@@ -8,6 +8,10 @@ var compile = function (musexpr, time) {
                   start: t,
                   dur: musexpr.dur }];
     }
+    else if (musexpr.tag == 'rest') {
+        time[0] += musexpr.dur;
+        return [];
+    }
     else if (musexpr.tag == 'par') {
         t = [time[0]];
         var r = compile(musexpr.left,t).concat(compile(musexpr.right,time));
