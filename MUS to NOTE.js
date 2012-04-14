@@ -4,6 +4,7 @@ var convertPitch = function (note) {
 }
 
 var compile = function (musexpr, time) {
+    var t, r;
     time = time || [0];
     if (musexpr.tag == 'note') {
         t = time[0];
@@ -17,9 +18,16 @@ var compile = function (musexpr, time) {
         time[0] += musexpr.dur;
         return [];
     }
+    else if (musexpr.tag == 'repeat') {
+        t = compile(musexpr.section,time);
+        r = [];
+        for (var i = 0; i < musexpr.count; i ++)
+            r.push(t);
+        return r;
+    }
     else if (musexpr.tag == 'par') {
         t = [time[0]];
-        var r = compile(musexpr.left,t).concat(compile(musexpr.right,time));
+        r = compile(musexpr.left,t).concat(compile(musexpr.right,time));
         if (t[0] > time[0])
             time[0] = t[0];
         return r;
