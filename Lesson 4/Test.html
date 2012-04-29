@@ -2,9 +2,16 @@
 <head>
   <meta charset="utf-8">
   <title>Scheem Live Demo</title>
+
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
   <script src="Eval.js"></script>
   <script src="Parser.js"></script>
+
+  <script src="lib/codemirror.js"></script>
+  <link rel="stylesheet" href="lib/codemirror.css">
+  <script src="mode/scheme/scheme.js"></script>
+
   <script>
   // Utility function to log messages
   var log_console = function(msg) {
@@ -12,8 +19,22 @@
   };
   // After page load
   var main = function() {
+    var cm_options = {
+      mode:  "javascript",
+      indentUnit: 4,
+      lineNumbers: true,
+      matchBrackets: true,
+      extraKeys: {
+        "Tab": "indentAuto",
+        "Ctrl-Enter": function() { $('#submitbutton').click(); },
+        "Ctrl-S": function() { }
+      }
+    }
+    var editor = CodeMirror.fromTextArea($("#input")[0], cm_options);
+
     $('#submitbutton').click(function() {
-        var user_text = $('#input').val();
+        //var user_text = $('#input').val();
+        var user_text = editor.getValue();
         $('#console').html(''); // clear console
         log_console('Your input was: "' + user_text + '"');
         try {
