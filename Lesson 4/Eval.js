@@ -65,6 +65,8 @@ var evalScheem = function (expr, env) {
         case 'define':
             if (expr.length != 3)
                 throw 'define: expected 2 parameters but received ' + (expr.length - 1);
+            if (typeof env[expr[1]] != 'undefined')
+                throw 'symbol already defined: ' + expr[1];
             env[expr[1]] = evalScheem(expr[2], env);
             return 0;
         case 'set!':
@@ -89,7 +91,7 @@ var evalScheem = function (expr, env) {
             if (evalScheem(expr[1], env) === '#t')
                 return evalScheem(expr[2]);
             if (typeof expr[3] === 'undefined')
-                return;
+                return 0;
             return evalScheem(expr[3]);
         case 'cons':
             if (expr.length != 3)
