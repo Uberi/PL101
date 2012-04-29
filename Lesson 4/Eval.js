@@ -10,38 +10,52 @@ var evalScheem = function (expr, env) {
     // Look at head of list for operation
     switch (expr[0]) {
         case '+':
+            if (expr.length < 3)
+                throw '+: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 r += evalScheem(expr[i], env);
             return r;
         case '-':
+            if (expr.length < 3)
+                throw '-: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 r -= evalScheem(expr[i], env);
             return r;
         case '*':
+            if (expr.length < 3)
+                throw '*: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 r *= evalScheem(expr[i], env);
             return r;
         case '/':
+            if (expr.length < 3)
+                throw '/: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 r /= evalScheem(expr[i], env);
             return r;
         case '=':
+            if (expr.length < 3)
+                throw '=: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 if (!(r === evalScheem(expr[i], env)))
                     return '#f';
             return '#t';
         case '<':
+            if (expr.length < 3)
+                throw '<: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 if (!(r < evalScheem(expr[i], env)))
                     return '#f';
             return '#t';
         case '>':
+            if (expr.length < 3)
+                throw '>: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
             for (var i = 2; i < expr.length; i++)
                 if (!(r > evalScheem(expr[i], env)))
