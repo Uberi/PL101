@@ -1,11 +1,12 @@
 var evalScheem = function (expr, env) {
     // Numbers evaluate to themselves
-    if (typeof expr === 'number') {
+    if (typeof expr === 'number')
         return expr;
-    }
     // Strings are variable references
     if (typeof expr === 'string') {
-        return env[expr];
+        if (typeof env[expr] != 'undefined')
+            return env[expr];
+        throw 'undefined symbol "' + expr + '"';
     }
     // Look at head of list for operation
     switch (expr[0]) {
@@ -13,30 +14,52 @@ var evalScheem = function (expr, env) {
             if (expr.length < 3)
                 throw '+: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
-            for (var i = 2; i < expr.length; i++)
-                r += evalScheem(expr[i], env);
+            if (typeof r != 'number')
+                throw '+: numerical parameters required';
+            for (var i = 2; i < expr.length; i++) {
+                var t = evalScheem(expr[i], env);
+                if (typeof t != 'number')
+                    throw '+: numerical parameters required';
+                r += t;
+            }
             return r;
         case '-':
             if (expr.length < 3)
                 throw '-: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
-            for (var i = 2; i < expr.length; i++)
-                r -= evalScheem(expr[i], env);
+            if (typeof r != 'number')
+                throw '-: numerical parameters required';
+            for (var i = 2; i < expr.length; i++) {
+                var t = evalScheem(expr[i], env);
+                if (typeof t != 'number')
+                    throw '-: numerical parameters required';
+                r -= t;
+            }
             return r;
         case '*':
             if (expr.length < 3)
                 throw '*: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
-            for (var i = 2; i < expr.length; i++)
-                r *= evalScheem(expr[i], env);
-            return r;
+            if (typeof r != 'number')
+                throw '*: numerical parameters required';
+            for (var i = 2; i < expr.length; i++) {
+                var t = evalScheem(expr[i], env);
+                if (typeof t != 'number')
+                    throw '*: numerical parameters required';
+                r *= t;
+            }
         case '/':
             if (expr.length < 3)
                 throw '/: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
-            for (var i = 2; i < expr.length; i++)
-                r /= evalScheem(expr[i], env);
-            return r;
+            if (typeof r != 'number')
+                throw '/: numerical parameters required';
+            for (var i = 2; i < expr.length; i++) {
+                var t = evalScheem(expr[i], env);
+                if (typeof t != 'number')
+                    throw '/: numerical parameters required';
+                r /= t;
+            }
         case '=':
             if (expr.length < 3)
                 throw '=: expected 2 or more parameters but received ' + (expr.length - 1);
@@ -49,17 +72,23 @@ var evalScheem = function (expr, env) {
             if (expr.length < 3)
                 throw '<: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
-            for (var i = 2; i < expr.length; i++)
-                if (!(r < evalScheem(expr[i], env)))
+            for (var i = 2; i < expr.length; i++) {
+                var t = evalScheem(expr[i], env)
+                if (r >= t)
                     return '#f';
+                r = t;
+            }
             return '#t';
         case '>':
             if (expr.length < 3)
                 throw '>: expected 2 or more parameters but received ' + (expr.length - 1);
             var r = evalScheem(expr[1], env);
-            for (var i = 2; i < expr.length; i++)
-                if (!(r > evalScheem(expr[i], env)))
+            for (var i = 2; i < expr.length; i++) {
+                var t = evalScheem(expr[i], env)
+                if (r <= t)
                     return '#f';
+                r = t;
+            }
             return '#t';
 
         case 'define':
