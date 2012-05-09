@@ -10,153 +10,142 @@ var functions = {
     '+': function (args, env) {
         if (args.length < 2)
             throw '+: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         if (typeof r != 'number')
             throw '+: numerical parameters required';
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env);
-            if (typeof t != 'number')
+            if (typeof args[i] != 'number')
                 throw '+: numerical parameters required';
-            r += t;
+            r += args[i];
         }
         return r;
     },
     '-': function (args, env) {
-        if (args.length < 2)
-            throw '-: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        if (args.length < 1)
+            throw '-: expected 1 or more parameters but received ' + args.length;
+        var r = args[0];
         if (typeof r != 'number')
             throw '-: numerical parameters required';
+        if (args.length === 1)
+            return -r;
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env);
-            if (typeof t != 'number')
+            if (typeof args[i] != 'number')
                 throw '-: numerical parameters required';
-            r -= t;
+            r -= args[i];
         }
         return r;
     },
     '*': function (args, env) {
         if (args.length < 2)
             throw '+: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         if (typeof r != 'number')
             throw '+: numerical parameters required';
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env);
-            if (typeof t != 'number')
+            if (typeof args[i] != 'number')
                 throw '+: numerical parameters required';
-            r *= t;
+            r *= args[i];
         }
         return r;
     },
     '/': function (args, env) {
         if (args.length < 2)
             throw '/: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         if (typeof r != 'number')
             throw '/: numerical parameters required';
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env);
-            if (typeof t != 'number')
+            if (typeof args[i] != 'number')
                 throw '/: numerical parameters required';
-            r /= t;
+            r /= args[i];
         }
         return r;
     },
     '=': function (args, env) {
         if (args.length < 2)
             throw '=: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         for (var i = 1; i < args.length; i++)
-            if (!(r === evalScheem(args[i], env)))
+            if (r != args[i])
                 return '#f';
         return '#t';
     },
     '<': function (args, env) {
         if (args.length < 2)
             throw '<: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env)
-            if (r >= t)
+            if (r >= args[i])
                 return '#f';
-            r = t;
+            r = args[i];
         }
         return '#t';
     },
     '>': function (args, env) {
         if (args.length < 2)
             throw '>: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env)
-            if (r <= t)
+            if (r <= args[i])
                 return '#f';
-            r = t;
+            r = args[i];
         }
         return '#t';
     },
     '<=': function (args, env) {
         if (args.length < 2)
             throw '<=: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env)
-            if (r > t)
+            if (r > args[i])
                 return '#f';
-            r = t;
+            r = args[i];
         }
         return '#t';
     },
     '>=': function (args, env) {
         if (args.length < 2)
             throw '>=: expected 2 or more parameters but received ' + args.length;
-        var r = evalScheem(args[0], env);
+        var r = args[0];
         for (var i = 1; i < args.length; i++) {
-            var t = evalScheem(args[i], env)
-            if (r < t)
+            if (r < args[i])
                 return '#f';
-            r = t;
+            r = args[i];
         }
         return '#t';
     },
     'cons': function (args, env) {
         if (args.length != 2)
             throw 'cons: expected 2 parameters but received ' + args.length;
-        return [evalScheem(args[0], env)]
-            .concat(evalScheem(args[1], env));
+        return [args[0]].concat(args[1]);
     },
     'car': function (args, env) {
         if (args.length != 1)
             throw 'car: expected 1 parameter but received ' + args.length;
-        var r = evalScheem(args[0], env);
-        if (r.length === 0)
+        if (args[0].length === 0)
             throw 'car: empty array';
-        return r[0];
+        return args[0][0];
     },
     'cdr': function (args, env) {
         if (args.length != 1)
             throw 'cdr: expected 1 parameter but received ' + args.length;
-        var r = evalScheem(expr[1], env);
+        var r = args[0];
         if (r.length === 0)
             throw 'cdr: empty array';
         r.splice(0,1);
         return r;
     },
     'begin': function (args, env) {
-        var r = 0;
-        for (var i = 0; i < args.length; i++)
-            r = evalScheem(args[i], env);
-        return r;
+        return args[args.length - 1];
     },
-    'let-one': function (args, env) {
+    'let-one': function (args, env) { //wip
         if (args.length != 3)
             throw 'let-one: expected 3 parameters but received ' + args.length;
         var newenv = {bindings: {}, outer: env};
-        newenv.bindings[args[0]] = evalScheem(args[1], env);
+        newenv.bindings[args[0]] = args[1];
         return evalScheem(args[2], newenv);
     },
-    'let': function (args, env) {
+    'let': function (args, env) { //wip
         if (args.length != 3)
             throw 'let: expected 2 parameters but received ' + args.length;
         var newenv = {bindings: {}, outer: env};
@@ -172,7 +161,7 @@ var functions = {
         if (args.length != 1)
             throw 'alert: expected 1 parameter but received ' + args.length;
         alert(args[0]);
-        return 0;
+        return args[0];
     }
 };
 
@@ -231,7 +220,7 @@ var evalScheem = function (expr, env) {
             };
         default:
             var r = evalScheem(expr[0], env);
-            t = []
+            var t = []
             for (var i = 1; i < expr.length; i++)
                 t.push(evalScheem(expr[i], env));
             return r(t, env);
