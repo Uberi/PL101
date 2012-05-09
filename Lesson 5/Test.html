@@ -13,12 +13,17 @@
     <style>
     body { background-color:#555555; }
 
+    h1
+    {
+        text-align:center;
+        color:#444444;
+        font-family: "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+    }
+
     #content
     {
-        position:absolute;
-        top:10%;
-        left:10%;
-        width:80%;
+        margin:5em;
+        padding:1em;
         background-color:#EEEEEE;
         border-radius:0.5em;
     }
@@ -28,7 +33,7 @@
         margin:1em;
         display:block;
         width:100%;
-        height:35em;
+        height:25em;
     }
 
     .CodeMirror-scroll
@@ -36,7 +41,7 @@
         margin:1em;
         border-style:solid;
         border-color:#AAAAAA;
-        height:35em;
+        height:25em;
     }
 
     #console
@@ -59,15 +64,15 @@
                 var parsed = SCHEEM.parse(code);
             }
             catch(e) {
-                $('#console').text('Parse Error: ' + e).css('border-color','#FFCACA');
+                $('#console').text('Parse Error: ' + e).css('border-color','#FFAAAA');
                 return;
             }
             try {
                 var result = evalScheem(parsed);
-                $('#console').text('' + result).css('border-color','#CAFFCA');
+                $('#console').text('' + result).css('border-color','#AAFFAA');
             }
             catch(e) {
-                $('#console').text('Evaluation Error: ' + e).css('border-color','#FFE5CA');
+                $('#console').text('Evaluation Error: ' + e).css('border-color','#FFE5AA');
             }
         };
 
@@ -92,6 +97,7 @@
 
 <body onload="main()">
     <div id="content">
+        <h1>Scheem Live Demo</h1>
         <textarea id="input">(begin
         (define factorial
             (lambda (n)
