@@ -51,7 +51,13 @@
 </head>
 
 <body onload="main()">
-    <textarea id="input">(+ 1 2)</textarea>
+    <textarea id="input">(begin
+    (define factorial
+        (lambda (n)
+            (if (= n 0)
+                1
+                (* n (factorial (- n 1))))))
+    (factorial 5))</textarea>
     <br>
     <pre id="console" class="console">hi</pre>
 </body>

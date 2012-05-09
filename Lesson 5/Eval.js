@@ -37,10 +37,10 @@ var functions = {
     },
     '*': function (args, env) {
         if (args.length < 2)
-            throw '+: expected 2 or more parameters but received ' + args.length;
+            throw '*: expected 2 or more parameters but received ' + args.length;
         var r = args[0];
         if (typeof r != 'number')
-            throw '+: numerical parameters required';
+            throw '*: numerical parameters required';
         for (var i = 1; i < args.length; i++) {
             if (typeof args[i] != 'number')
                 throw '+: numerical parameters required';
@@ -205,10 +205,10 @@ var evalScheem = function (expr, env) {
             if (expr.length != 3 && expr.length != 4)
                 throw 'if: expected 2 or 3 parameters but received ' + (expr.length - 1);
             if (evalScheem(expr[1], env) === '#t')
-                return evalScheem(expr[2]);
+                return evalScheem(expr[2], env);
             if (typeof expr[3] === 'undefined')
                 return 0;
-            return evalScheem(expr[3]);
+            return evalScheem(expr[3], env);
         case 'lambda':
             if (expr.length != 3)
                 throw 'lambda: expected 2 parameters but received ' + (expr.length - 1);
