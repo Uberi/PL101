@@ -1,0 +1,234 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Tortoise Live Demo</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <script src="http://nathansuniversity.com/js/raphael-min.js"></script>
+    <script src="TORTOISE.js"></script>
+    <script src="Eval.js"></script>
+
+    <script src="lib/codemirror.js"></script>
+    <link rel="stylesheet" href="lib/codemirror.css">
+    <style>
+    body { background-color:#555555; }
+
+    h1
+    {
+        text-align:center;
+        color:#444444;
+        font-family: "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+    }
+
+    #content
+    {
+        margin:5em;
+        padding:1em;
+        background-color:#EEEEEE;
+        border-radius:0.5em;
+        overflow:hidden;
+    }
+
+    #input
+    {
+        margin:1em;
+        display:block;
+        width:100%;
+        height:25em;
+    }
+
+    .CodeMirror-scroll
+    {
+        margin:1em;
+        border-style:solid;
+        border-color:#AAAAAA;
+        height:25em;
+    }
+
+    #console
+    {
+        margin:1em;
+        padding:1em;
+        border-style:solid;
+        background-color:#444444;
+        color:#FFFFFF;
+        border-radius:0.5em;
+    }
+
+    #output
+    {
+        margin:1em;
+        padding:1em;
+        height:30em;
+        border-style:solid;
+        background-color:#FFFFFF;
+        border-radius:0.5em;
+    }
+    </style>
+    <script src="mode/scheme/scheme.js"></script>
+
+    <script>
+    var Turtle = function (id) {
+        var e = $('#' + id);
+        this.paper = Raphael(id);
+        this.originx = e.width() / 2;
+        this.originy = e.height() / 2;
+        this.clear();
+    };
+    Turtle.prototype.clear = function () {
+        this.paper.clear();
+        this.x = this.originx;
+        this.y = this.originy;
+        this.angle = 90;
+        this.width = 4;
+        this.opacity = 1.0;
+        this.color = '#FF0000';
+        this.pen = true;
+        
+        this.turtleimg = undefined;
+        this.updateTurtle();
+    };
+
+    Turtle.prototype.updateTurtle = function () {
+        if(this.turtleimg === undefined) {
+            this.turtleimg = this.paper.image("http://nathansuniversity.com/gfx/turtle2.png", 0, 0, 64, 64);
+        }
+        this.turtleimg.attr({
+            x: this.x - 32,
+            y: this.y - 32,
+            transform: "r" + (-this.angle)});
+        this.turtleimg.toFront();
+    };
+
+    Turtle.prototype.drawTo = function (x, y) {
+        var x1 = this.x;
+        var y1 = this.y;
+        var params = {
+            "stroke-width": this.width,
+            "stroke-linecap": "round",
+            "stroke-linejoin": "round",
+            "stroke": this.color,
+            "stroke-opacity": this.opacity
+        };
+        var path = this.paper.path(Raphael.format("M{0},{1}L{2},{3}",
+            x1, y1, x, y)).attr(params);
+    };
+
+    Turtle.prototype.forward = function (d) {
+        var newx = this.x + Math.cos(Raphael.rad(this.angle)) * d;
+        var newy = this.y - Math.sin(Raphael.rad(this.angle)) * d;
+        if(this.pen)
+            this.drawTo(newx, newy);
+        this.x = newx;
+        this.y = newy;
+        this.updateTurtle();
+    };
+
+    Turtle.prototype.right = function (ang) {
+        this.angle -= ang;
+        this.updateTurtle();
+    };
+
+    Turtle.prototype.left = function (ang) {
+        this.angle += ang;
+        this.updateTurtle();
+    };
+
+    Turtle.prototype.setOpacity = function(opacity) {
+        this.opacity = opacity;
+    };
+
+    Turtle.prototype.setWidth = function(width) {
+        this.width = width;
+    };
+
+    Turtle.prototype.setColor = function(r, g, b) {
+        this.color = Raphael.rgb(r, g, b);
+    };
+
+    Turtle.prototype.setPosition = function(x, y) {
+        this.x = x;
+        this.y = y;
+        this.updateTurtle();
+    };
+
+    Turtle.prototype.setHeading = function(a) {
+        this.angle = a;
+        this.updateTurtle();
+    };
+
+    Turtle.prototype.penup = function () {
+        this.pen = false;
+    };
+
+    Turtle.prototype.pendown = function () {
+        this.pen = true;
+    };
+    </script>
+
+    <script>
+    var main = function() {
+        var update = function() {
+            var myTurtle = new Turtle('output');
+            var init_env = {bindings: {}};
+            init_env.bindings.forward = function (x) { myTurtle.forward(x); };
+            init_env.bindings.right = function (x) { myTurtle.right(x); };
+            init_env.bindings.left = function (x) { myTurtle.left(x); };
+            init_env.bindings.setOpacity = function (x) { myTurtle.setOpacity(x); };
+            init_env.bindings.setWidth = function (x) { myTurtle.setWidth(x); };
+            init_env.bindings.setColor = function (x) { myTurtle.setColor(x); };
+            init_env.bindings.setPosition = function (x) { myTurtle.setPosition(x); };
+            init_env.bindings.setHeading = function (x) { myTurtle.setHeading(x); };
+
+            var code = editor.getValue();
+            try {
+                var parsed = TORTOISE.parse(code);
+            }
+            catch(e) {
+                $('#console').text('Parse Error: ' + e).css('border-color','#FFAAAA');
+                return;
+            }
+            try {
+                var result = evalStatements(parsed, init_env);
+                $('#console').text('' + result).css('border-color','#AAFFAA');
+            }
+            catch(e) {
+                $('#console').text('Evaluation Error: ' + e).css('border-color','#FFE5AA');
+            }
+        };
+
+        var cm_options = {
+            mode:  "javascript",
+            indentUnit: 4,
+            lineNumbers: true,
+            lineWrapping: true,
+            matchBrackets: true,
+            onChange: update,
+            extraKeys: {
+                "Tab": "indentAuto",
+                "Ctrl-S": function() { }
+            }
+        };
+
+        var editor = CodeMirror.fromTextArea($("#input")[0], cm_options);
+        update();
+    };
+    </script>
+</head>
+
+<body onload="main()">
+    <div id="content">
+        <h1>Tortoise Live Demo</h1>
+        <textarea id="input">forward(100);
+left(90);
+forward(100);
+left(90);
+forward(100);
+left(90);
+forward(100);</textarea>
+        <pre id="console">Output</pre>
+        <div id="output"></div>
+    </div>
+</body>
+</html>
